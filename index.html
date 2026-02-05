@@ -1,1314 +1,1201 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGIS KHDTK Wanadipa - Inventaris Fasilitas</title>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Leaflet Routing Machine CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-    <!-- Font Awesome untuk ikon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            color: #333;
-            background-color: #f5f5f5;
-        }
-        
-        /* Sidebar Styles - Diubah ke putih */
-        #sidebar {
-            width: 350px;
-            background-color: white;
-            color: #333;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            overflow-y: auto;
-            border-right: 1px solid #e0e0e0;
-        }
-        
-        .logo-container {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #27ae60;
-        }
-        
-        .logos-wrapper {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            margin: 15px 0;
-            gap: 10px;
-        }
-        
-        .logo-img {
-            max-width: 100px;
-            max-height: 100px;
-            object-fit: contain;
-            padding: 5px;
-            border-radius: 5px;
-        }
-        
-        .logo-undip {
-            background-color: transparent;
-            border: 2px solid #0066cc00;
-        }
-        
-        .logo-kkn {
-            background-color: transparent;
-            border: 2px solid #ff660000;
-        }
-        
-        .logo-container h1 {
-            font-size: 1.4rem;
-            margin-bottom: 5px;
-            color: #2c3e50;
-        }
-        
-        .logo-container p {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 10px;
-        }
-        
-        .sidebar-section {
-            margin-bottom: 25px;
-        }
-        
-        .section-title {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            color: #27ae60;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-        }
-        
-        .section-title i {
-            font-size: 1rem;
-            color: #27ae60;
-        }
-        
-        /* Peta Styles */
-        #map-container {
-            flex: 1;
-            position: relative;
-        }
-        
-        #map {
-            width: 100%;
-            height: 100%;
-        }
-        
-        /* Kontrol Map */
-        .map-controls {
-            position: absolute;
-            top: 15px;
-            right: 15px; 
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .control-btn {
-            background-color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            color: #2c3e50;
-            width: 45px;
-            height: 45px;
-        }
-        
-        .control-btn:hover {
-            background-color: #27ae60;
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        .control-btn i {
-            font-size: 1.2rem;
-        }
-        
-        /* Layer Control */
-        .layer-control {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-            border: 1px solid #e9ecef;
-        }
-        
-        .layer-option {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 8px;
-            border-radius: 5px;
-            transition: background-color 0.2s;
-        }
-        
-        .layer-option:hover {
-            background-color: #e9ecef;
-        }
-        
-        .layer-option:last-child {
-            margin-bottom: 0;
-        }
-        
-        .layer-option input {
-            margin-right: 10px;
-            accent-color: #27ae60;
-        }
-        
-        .layer-option label {
-            color: #333;
-            font-weight: 500;
-        }
-        
-        /* Fasilitas List */
-        .facility-list {
-            max-height: 300px;
-            overflow-y: auto;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 10px;
-            border: 1px solid #e9ecef;
-        }
-        
-        .facility-item {
-            background-color: white;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid #e9ecef;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .facility-item:hover {
-            background-color: #f0f7ff;
-            transform: translateX(3px);
-            border-color: #27ae60;
-        }
-        
-        .facility-item.active {
-            background-color: #e8f5e9;
-            border-color: #27ae60;
-        }
-        
-        .facility-item h4 {
-            font-size: 1rem;
-            margin-bottom: 5px;
-            color: #2c3e50;
-        }
-        
-        .facility-item p {
-            font-size: 0.85rem;
-            color: #666;
-        }
-        
-        /* Filter */
-        .filter-control {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-            border: 1px solid #e9ecef;
-        }
-        
-        select, input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            margin-bottom: 10px;
-            background-color: white;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        select:focus, input:focus {
-            outline: none;
-            border-color: #27ae60;
-            box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);
-        }
-        
-        /* Button Styles */
-        .btn {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-        
-        .btn:hover {
-            background-color: #219653;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
-        }
-        
-        .btn-secondary {
-            background-color: #3498db;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #2980b9;
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
-        }
-        
-        /* Popup Styles */
-        .leaflet-popup-content {
-            min-width: 250px;
-            max-width: 300px;
-            color: #333;
-        }
-        
-        .popup-facility h3 {
-            color: #27ae60;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 5px;
-        }
-        
-        .popup-facility p {
-            margin-bottom: 8px;
-            color: #555;
-        }
-        
-        .popup-facility strong {
-            color: #2c3e50;
-        }
-        
-        .popup-facility img {
-            width: 100%;
-            border-radius: 5px;
-            margin-top: 10px;
-            max-height: 200px;
-            object-fit: cover;
-            border: 1px solid #ddd;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-            
-            #sidebar {
-                width: 100%;
-                height: 40vh;
-            }
-            
-            #map-container {
-                height: 60vh;
-            }
-            
-            .logos-wrapper {
-                flex-direction: column;
-            }
-            
-            .logo-img {
-                max-width: 80px;
-                max-height: 80px;
-            }
-            
-            .map-controls {
-                left: 10px;
-                top: 10px;
-            }
-        }
-        
-        /* Legenda */
-        .legend {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            font-size: 0.8rem;
-            border: 1px solid #e9ecef;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        
-        .legend-color {
-            width: 15px;
-            height: 15px;
-            margin-right: 8px;
-            border-radius: 3px;
-            border: 1px solid #fff;
-        }
-        
-        /* Scrollbar styling */
-        .facility-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .facility-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-        
-        .facility-list::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-        
-        .facility-list::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-        
-        /* Leaflet control styling */
-        .leaflet-control-attribution {
-            background-color: rgba(255, 255, 255, 0.8) !important;
-            color: #333 !important;
-        }
-        
-        .leaflet-control-attribution a {
-            color: #27ae60 !important;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KHDTK Wanadipa UNDIP</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --primary: #1e8449;
+    --primary-dark: #146b3a;
+    --accent: #27ae60;
+    --accent-light: #2ecc71;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #2c3e50;
+    --text-light: #7f8c8d;
+    --border: #e2e8f0;
+    --shadow: rgba(0, 0, 0, 0.08);
+    --shadow-hover: rgba(0, 0, 0, 0.12);
+    --danger: #e74c3c;
+    --warning: #f39c12;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+}
+
+/* ===== SIDEBAR ===== */
+#sidebar {
+    width: 380px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    overflow-y: auto;
+    padding: 0;
+    box-shadow: 4px 0 25px var(--shadow);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.hero {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 0;
+    padding: 25px 20px;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.hero img {
+    max-width: 70px;
+    height: auto;
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+}
+
+.hero h1 {
+    font-size: 1.4rem;
+    margin: 10px 0 5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.hero small {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.sidebar-content {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.section {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 6px 20px var(--shadow);
+    border: 1px solid var(--border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.section:hover {
+    box-shadow: 0 8px 25px var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--primary);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #f0f7f4;
+    padding-bottom: 8px;
+}
+
+.section-title i {
+    font-size: 1.1rem;
+}
+
+/* ===== FORM ===== */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.radio-label:hover {
+    background-color: #f0f7f4;
+    border-color: var(--accent-light);
+}
+
+.radio-label input {
+    margin-right: 10px;
+    width: auto;
+}
+
+select, input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    background-color: white;
+}
+
+select:focus, input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+button {
+    width: 100%;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    background: linear-gradient(to right, var(--accent), var(--accent-light));
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2);
+}
+
+button:hover {
+    background: linear-gradient(to right, var(--primary), var(--accent));
+    box-shadow: 0 6px 15px rgba(39, 174, 96, 0.3);
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* ===== LIST ===== */
+.facility-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.facility-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.facility-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.facility-list::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 10px;
+}
+
+.facility-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border-left: 4px solid var(--accent);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.facility-item:hover {
+    background: #f0f7f4;
+    border-color: var(--accent);
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.facility-item.active {
+    background: #e8f5e9;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(30, 132, 73, 0.15);
+}
+
+.facility-name {
+    font-weight: 500;
+    margin-bottom: 5px;
+    font-size: 1rem;
+}
+
+.facility-category {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    background: #f1f8f4;
+    padding: 3px 8px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.facility-icon {
+    font-size: 1.2rem;
+    color: var(--accent);
+}
+
+/* ===== MAP ===== */
+#map-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#map {
+    height: 100%;
+    z-index: 1;
+}
+
+/* ===== MARKER ===== */
+.custom-marker i {
+    font-size: 22px;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+}
+
+.custom-marker i:hover {
+    transform: scale(1.4);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== POPUP ===== */
+.leaflet-popup-content {
+    min-width: 280px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.leaflet-popup-content h3 {
+    margin: 0 0 10px 0;
+    color: var(--primary);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.popup-details {
+    margin: 10px 0;
+    font-size: 0.9rem;
+}
+
+.popup-details div {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.leaflet-popup-content img {
+    width: 100%;
+    border-radius: 10px;
+    margin: 15px 0 10px 0;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    background: linear-gradient(to right, var(--accent), var(--accent-light));
+    color: white;
+    margin-bottom: 10px;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== ROUTING ===== */
+.leaflet-routing-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    font-family: 'Poppins', sans-serif;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    #sidebar {
+        width: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+    
+    #sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 50vh;
+        box-shadow: 0 4px 15px var(--shadow);
+    }
+    
+    #map-container {
+        height: 50vh;
+    }
+}
+
+/* ===== STATS ===== */
+.stats-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+/* ===== LEGEND ===== */
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* ===== LOADING ===== */
+.loading {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    text-align: center;
+}
+
+.loading i {
+    color: var(--accent);
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+/* ===== MAP CONTROLS ===== */
+.map-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--text);
+    font-size: 1.2rem;
+}
+
+.control-btn:hover {
+    background: var(--accent);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+</style>
 </head>
+
 <body>
-    <!-- Sidebar -->
-    <div id="sidebar">
+
+<!-- ===== SIDEBAR ===== -->
+<div id="sidebar">
+    <div class="hero">
         <div class="logo-container">
-
-                        <div class="logos-wrapper">
-                <!-- Logo UNDIP -->
-                <img src="https://ik.imagekit.io/amddil/foto%20fasilitas/logo_undip-removebg-preview.png" 
-                     alt="Logo UNDIP" 
-                     class="logo-img logo-undip"
-                     id="logo-undip">
-                
-                <!-- Logo KKN -->
-                <img src="https://ik.imagekit.io/amddil/foto%20fasilitas/KKN%20TEMATIK%20UNDIP.png" 
-                     alt="Logo KKN" 
-                     class="logo-img logo-kkn"
-                     id="logo-kkn">
-            </div>
-
-            <p2>Program KKN Tematik Tim 19 UNDIP 2026</p2>
-
-            <h1><i class="fas fa-tree"></i> KHDTK WANADIPA UNDIP</h1>
-            <p2>Sistem Inventaris Fasilitas untuk Pengembangan Agrowisata Tahun 2025</p2>
-            
-           
-           <p>Create by: M. Amdad Iltimas | Teknik Geodesi</p>
+            <img src="https://ik.imagekit.io/amddil/foto%20fasilitas/logo_undip-removebg-preview.png" alt="Logo UNDIP">
+            <img src="https://ik.imagekit.io/amddil/foto%20fasilitas/KKN%20TEMATIK%20UNDIP.png" alt="Logo KKN Tematik">
         </div>
-        
-        <div class="sidebar-section">
-            <div class="section-title">
-                <i class="fas fa-layer-group"></i>
-                <span>Jenis Peta</span>
+        <small>KKN Tematik TIM 19 UNDIP 2026 • Sistem Inventaris Fasilitas KHDTK Wanadipa 2025</small>
+        <h1><i class="fas fa-tree"></i> KHDTK WANADIPA UNDIP</h1>
+        </p2>
+        <small>Create by: M. Amdad Iltimas | Teknik Geodesi</small>
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-value" id="total-facilities">14</div>
+                <div class="stat-label">Fasilitas</div>
             </div>
-            <div class="layer-control">
-                <div class="layer-option">
-                    <input type="radio" id="basemap-osm" name="basemap" value="osm" checked>
-                    <label for="basemap-osm">OpenStreetMap</label>
-                </div>
-                <div class="layer-option">
-                    <input type="radio" id="basemap-imagery" name="basemap" value="imagery">
-                    <label for="basemap-imagery">Citra Satelit</label>
-                </div>
-                <div class="layer-option">
-                    <input type="radio" id="basemap-topo" name="basemap" value="topo">
-                    <label for="basemap-topo">Topografi</label>
-                </div>
+            <div class="stat-item">
+                <div class="stat-value" id="visible-facilities">14</div>
+                <div class="stat-label">Tampil</div>
             </div>
-        </div>
-        
-        <div class="sidebar-section">
-            <div class="section-title">
-                <i class="fas fa-filter"></i>
-                <span>Filter Fasilitas</span>
-            </div>
-            <div class="filter-control">
-                <select id="filter-type">
-                    <option value="all">Semua Fasilitas</option>
-                    <option value="perkantoran">Perkantoran</option>
-                    <option value="wisata">Wisata</option>
-                    <option value="parkir">Parkir</option>
-                    <option value="pertanian">Pertanian</option>
-                    <option value="energi">Energi Terbarukan</option>
-                    <option value="peternakan">Peternakan</option>
-                    <option value="akses">Akses</option>
-                </select>
-                
-                <input type="text" id="search-facility" placeholder="Cari fasilitas...">
-                
-                <button class="btn" id="btn-locate">
-                    <i class="fas fa-location-crosshairs"></i> Lokasi Saya
-                </button>
-            </div>
-        </div>
-        
-        <div class="sidebar-section">
-            <div class="section-title">
-                <i class="fas fa-list"></i>
-                <span>Daftar Fasilitas</span>
-            </div>
-            <div class="facility-list" id="facility-list">
-                <!-- Daftar fasilitas akan diisi oleh JavaScript -->
-            </div>
-        </div>
-        
-        <div class="sidebar-section">
-            <div class="section-title">
-                <i class="fas fa-map-signs"></i>
-                <span>Navigasi Rute</span>
-            </div>
-            <div class="filter-control">
-                <p style="color: #666; font-size: 0.9rem; margin-bottom: 10px;">Menghitung rute dari lokasi Anda ke Gerbang Utama KHDTK Wanadipa</p>
-                
-                <button class="btn btn-secondary" id="btn-route">
-                    <i class="fas fa-route"></i> Hitung Rute ke Gerbang Utama
-                </button>
-                
-                <button class="btn" id="btn-clear-route" style="background-color: #e74c3c; margin-top: 5px;">
-                    <i class="fas fa-times"></i> Hapus Rute
-                </button>
-            </div>
-        </div>
-        
-        <div class="legend">
-            <div class="section-title">
-                <i class="fas fa-key"></i>
-                <span>Legenda</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #3498db;"></div>
-                <span>Perkantoran</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #e74c3c;"></div>
-                <span>Wisata</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #95a5a6;"></div>
-                <span>Parkir</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #2ecc71;"></div>
-                <span>Pertanian</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #1abc9c;"></div>
-                <span>Energi Terbarukan</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #f39c12;"></div>
-                <span>Peternakan</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #9b59b6;"></div>
-                <span>Akses</span>
+            <div class="stat-item">
+                <div class="stat-value">7</div>
+                <div class="stat-label">Kategori</div>
             </div>
         </div>
     </div>
     
-    <!-- Peta -->
-    <div id="map-container">
-        <div id="map"></div>
-        
-        <div class="map-controls">
-            <button class="control-btn" id="btn-zoom-in" title="Perbesar">
-                <i class="fas fa-plus"></i>
-            </button>
-            <button class="control-btn" id="btn-zoom-out" title="Perkecil">
-                <i class="fas fa-minus"></i>
-            </button>
-            <button class="control-btn" id="btn-fullscreen" title="Layar Penuh">
-                <i class="fas fa-expand"></i>
-            </button>
-            <button class="control-btn" id="btn-download" title="Unduh Data">
-                <i class="fas fa-download"></i>
+    <div class="sidebar-content">
+        <div class="section">
+            <div class="section-title"><i class="fa-solid fa-layer-group"></i> Peta Dasar</div>
+            <div class="radio-group">
+                <label class="radio-label">
+                    <input type="radio" name="basemap" value="osm" checked> OpenStreetMap
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="basemap" value="imagery"> Citra Satelit
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="basemap" value="topo"> Topografi
+                </label>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fa-solid fa-filter"></i> Filter Fasilitas</div>
+            <select id="filter-type">
+                <option value="all">Semua Fasilitas</option>
+                <option value="wisata">Wisata</option>
+                <option value="pertanian">Pertanian</option>
+                <option value="energi">Energi</option>
+                <option value="peternakan">Peternakan</option>
+                <option value="perkantoran">Perkantoran</option>
+                <option value="parkir">Parkir</option>
+                <option value="akses">Akses</option>
+            </select>
+            <input type="text" id="search-facility" placeholder="Cari fasilitas...">
+            <button id="btn-locate"><i class="fa-solid fa-location-crosshairs"></i> Lokasi Saya</button>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #27ae60;"></div>
+                    <span>Fasilitas Aktif</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e74c3c;"></div>
+                    <span>Gerbang Utama</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fa-solid fa-list"></i> Daftar Fasilitas</div>
+            <div class="facility-list" id="facility-list">
+                <!-- Facility items will be generated here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fa-solid fa-route"></i> Navigasi</div>
+            <button id="btn-route"><i class="fa-solid fa-directions"></i> Rute ke Gerbang Utama</button>
+            <button id="btn-clear-route" style="background: linear-gradient(to right, #e74c3c, #c0392b); margin-top: 10px;">
+                <i class="fa-solid fa-trash"></i> Hapus Rute
             </button>
         </div>
     </div>
+</div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Leaflet Routing Machine -->
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-    <script>
-        // Data fasilitas dari GeoJSON Anda
-        const facilitiesData = {
-            "type": "FeatureCollection",
-            "name": "point_Fasil",
-            "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-            "features": [
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 0, 
-                        "Nama": "Tempat Pemancingan 1", 
-                        "Luas": 143.712551, 
-                        "Lon": 110.431909, 
-                        "Lat": -7.114901,
-                        "category": "wisata",
-                        "established": "2023",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/tempat%20mancing%201.jpeg?updatedAt=1768962099719",
-                        "description": "Area pemancingan pertama di KHDTK Wanadipa UNDIP"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.431909045443035, -7.114901083659322 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 1, 
-                        "Nama": "Tempat Parkir", 
-                        "Luas": 266.864788, 
-                        "Lon": 110.431933, 
-                        "Lat": -7.115053,
-                        "category": "parkir",
-                        "established": "2023",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/tempat%20parkir.jpeg?updatedAt=1768962098594",
-                        "description": "Area parkir untuk pengunjung dan kendaraan operasional"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.431933184280922, -7.115052871733886 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 2, 
-                        "Nama": "GreenHouse Wanadipa", 
-                        "Luas": 196.866377, 
-                        "Lon": 110.432461, 
-                        "Lat": -7.115798,
-                        "category": "pertanian",
-                        "established": "2023",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/greenhouse.jpeg?updatedAt=1768962098853",
-                        "description": "Greenhouse untuk penelitian dan pengembangan tanaman"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.432461096587915, -7.11579765674825 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 4, 
-                        "Nama": "Bale Wanadipa UNDIP", 
-                        "Luas": 114.478135, 
-                        "Lon": 110.432345, 
-                        "Lat": -7.115683,
-                        "category": "perkantoran",
-                        "established": "2023",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/joglo.jpeg?updatedAt=1768962098502",
-                        "description": "Bangunan utama untuk kegiatan administrasi dan pertemuan"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.432345411480142, -7.115682710676862 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 8, 
-                        "Nama": "Kantor KHDTK UNDIP", 
-                        "Luas": 228.811689, 
-                        "Lon": 110.431931, 
-                        "Lat": -7.115282,
-                        "category": "perkantoran",
-                        "established": "2022",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/kantor.jpeg?updatedAt=1768962098350",
-                        "description": "Kantor pengelolaan KHDTK Wanadipa Universitas Diponegoro"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.431930736183801, -7.115281712980278 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 5, 
-                        "Nama": "Mushola Al-Ikhlas", 
-                        "Luas": 107.774981, 
-                        "Lon": 110.431707, 
-                        "Lat": -7.115212,
-                        "category": "perkantoran",
-                        "established": "2025",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/mushola.jpeg?updatedAt=1768962099287",
-                        "description": "Tempat ibadah untuk pengunjung dan pengelola"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.43170710538692, -7.115211518839631 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 6, 
-                        "Nama": "Microalgae Production Site", 
-                        "Luas": 125.034447, 
-                        "Lon": 110.432214, 
-                        "Lat": -7.115537,
-                        "category": "energi",
-                        "established": "2022",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/microalgae.jpeg?updatedAt=1768962100112",
-                        "description": "Area produksi mikroalga untuk penelitian bioenergi"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.432214305163527, -7.115537124667235 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 7, 
-                        "Nama": "Tempat Pemancingan 2", 
-                        "Luas": 173.79093, 
-                        "Lon": 110.433359, 
-                        "Lat": -7.116367,
-                        "category": "wisata",
-                        "established": "2023",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/tempat%20mancing%202.jpeg?updatedAt=1768962101420",
-                        "description": "Area pemancingan kedua dengan spot yang berbeda"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.433358611054743, -7.116366596122383 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 9, 
-                        "Nama": "Bioenergy Sites", 
-                        "Luas": 146.96752, 
-                        "Lon": 110.43209, 
-                        "Lat": -7.115431,
-                        "category": "energi",
-                        "established": "2023",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/site%20production.jpeg?updatedAt=1768962100152",
-                        "description": "Lokasi pengembangan energi terbarukan dari biomassa"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.432090235808261, -7.115431161228177 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 10, 
-                        "Nama": "Kandang Sapi", 
-                        "Luas": 472.327483, 
-                        "Lon": 110.43119, 
-                        "Lat": -7.115376,
-                        "category": "peternakan",
-                        "established": "2022",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/Kandang%20Sapi.jpeg",
-                        "description": "Kandang sapi untuk penelitian peternakan terpadu"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.431189886369395, -7.115375727867813 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 13, 
-                        "Nama": "Tempat Parkir Bawah", 
-                        "Luas": 0, 
-                        "Lon": 110.4333167, 
-                        "Lat": -7.11615000,
-                        "category": "parkir",
-                        "established": "2024",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/parkir%20bawah.jpeg",
-                        "description": "Area parkir untuk pengunjung dan kendaraan operasional"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.4333167, -7.11615000 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 14, 
-                        "Nama": "Bedeng Proker KKN-T TIM 19", 
-                        "Luas": 25.8, 
-                        "Lon": 110.432551667, 
-                        "Lat": -7.1157383333,
-                        "category": "pertanian",
-                        "established": "2026",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/bedeng.jpeg",
-                        "description": "Bedeng berjumlah 6 dilengkapi dengan 4 sungkup serta kolam penampungan air hujan dan pipa pengairan menggunakan springkle untuk penyiraman tanaman"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.432551667, -7.1157383333 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 12, 
-                        "Nama": "Kandang Kambing", 
-                        "Luas": 26.172454, 
-                        "Lon": 110.4324, 
-                        "Lat": -7.1151,
-                        "category": "peternakan",
-                        "established": "2024",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/Kandang%20Kambing%20(2).jpeg",
-                        "description": "Kandang kambing untuk penelitian peternakan terpadu"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.4324, -7.1151 ] 
-                    } 
-                },
-                { 
-                    "type": "Feature", 
-                    "properties": { 
-                        "id": 11, 
-                        "Nama": "Gerbang Masuk Kawasan KHDTK Wanadipa UNDIP", 
-                        "Luas": null, 
-                        "Lon": 110.431709, 
-                        "Lat": -7.114327,
-                        "category": "akses",
-                        "established": "2020",
-                        "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/pintu%20masuk.jpeg?updatedAt=1768962098508",
-                        "description": "Gerbang utama masuk ke kawasan KHDTK Wanadipa"
-                    }, 
-                    "geometry": { 
-                        "type": "Point", 
-                        "coordinates": [ 110.431709041670018, -7.114327063128224 ] 
-                    } 
-                }
-            ]
-        };
+<!-- ===== MAP ===== -->
+<div id="map-container">
+    <div id="map"></div>
+    
+    <div class="map-controls">
+        <button class="control-btn" id="btn-zoom-in" title="Perbesar">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+        <button class="control-btn" id="btn-zoom-out" title="Perkecil">
+            <i class="fa-solid fa-minus"></i>
+        </button>
+        <button class="control-btn" id="btn-fullscreen" title="Layar Penuh">
+            <i class="fa-solid fa-expand"></i>
+        </button>
+    </div>
+    
+    <div class="loading" id="loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Memuat data...</p>
+    </div>
+</div>
 
-        // Inisialisasi peta dengan koordinat KHDTK Wanadipa
-        const map = L.map('map').setView([-7.1155, 110.432], 16);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
-        // Layer peta dasar
-        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        });
+<script>
+// === MAP INIT ===
+const map = L.map('map').setView([-7.1155, 110.432], 16);
 
-        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-        });
+// Base layers
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
 
-        const topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-        });
+const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
 
-        // Tambahkan layer OSM sebagai default
-        osmLayer.addTo(map);
+const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+});
 
-        // Variabel global untuk layer GeoJSON dan rute
-        let geojsonLayer = null;
-        let routingControl = null;
-        let userLocationMarker = null;
-        let gateCoordinates = null; // Koordinat gerbang utama
-
-        // Fungsi untuk membuat layer GeoJSON
-        function createGeoJSONLayer(data) {
-            // Hapus layer lama jika ada
-            if (geojsonLayer) {
-                map.removeLayer(geojsonLayer);
+// Basemap change handler
+document.querySelectorAll('input[name="basemap"]').forEach(radio => {
+    radio.onchange = () => {
+        map.eachLayer(layer => {
+            if (layer instanceof L.TileLayer) {
+                map.removeLayer(layer);
             }
-            
-            // Proses data untuk memastikan semua properti ada
-            const processedFeatures = data.features.map(feature => {
-                const props = feature.properties;
-                
-                // Simpan koordinat gerbang utama
-                if (props.Nama === "Gerbang Masuk Kawasan KHDTK Wanadipa UNDIP") {
-                    gateCoordinates = feature.geometry.coordinates;
-                }
-                
-                // Tambahkan id yang konsisten
-                if (!props.id) {
-                    props.id = props.Nama.toLowerCase().replace(/\s+/g, '_');
-                }
-                
-                return {
-                    ...feature,
-                    properties: props
-                };
-            });
-            
-            // Buat layer baru
-            geojsonLayer = L.geoJSON(null, {
-                pointToLayer: function(feature, latlng) {
-                    // Tentukan warna berdasarkan kategori
-                    let color;
-                    switch(feature.properties.category) {
-                        case 'perkantoran': color = '#3498db'; break;
-                        case 'wisata': color = '#e74c3c'; break;
-                        case 'parkir': color = '#95a5a6'; break;
-                        case 'pertanian': color = '#2ecc71'; break;
-                        case 'energi': color = '#1abc9c'; break;
-                        case 'peternakan': color = '#f39c12'; break;
-                        case 'akses': color = '#9b59b6'; break;
-                        default: color = '#34495e';
-                    }
-                    
-                    // Buat marker dengan ikon custom
-                    return L.circleMarker(latlng, {
-                        radius: 10,
-                        fillColor: color,
-                        color: '#fff',
-                        weight: 2,
-                        opacity: 1,
-                        fillOpacity: 0.8
-                    });
-                },
-                onEachFeature: function(feature, layer) {
-                    // Bind popup untuk setiap fitur
-                    const props = feature.properties;
-                    let content = `<div class="popup-facility">
-                        <h3>${props.Nama}</h3>
-                        <p><strong>Kategori:</strong> ${props.category}</p>`;
-                    
-                    if (props.established) {
-                        content += `<p><strong>Tahun Berdiri:</strong> ${props.established}</p>`;
-                    }
-                    
-                    if (props.Luas) {
-                        content += `<p><strong>Luas:</strong> ${props.Luas.toFixed(2)} m²</p>`;
-                    }
-                    
-                    // Koordinat sudah ada di properti
-                    if (props.Lat && props.Lon) {
-                        content += `<p><strong>Koordinat:</strong> ${props.Lat.toFixed(6)}, ${props.Lon.toFixed(6)}</p>`;
-                    }
-                    
-                    if (props.description) {
-                        content += `<p>${props.description}</p>`;
-                    }
-                    
-                    if (props.photo) {
-                        content += `<img src="${props.photo}" alt="${props.Nama}">`;
-                    }
-                    
-                    content += `</div>`;
-                    
-                    layer.bindPopup(content);
-                    
-                    // Tambahkan event untuk sidebar
-                    layer.on('click', function() {
-                        highlightFacilityInList(props.id || props.Nama);
-                    });
-                }
-            }).addTo(map);
-
-            // Tambahkan data GeoJSON ke layer
-            const processedData = {
-                ...data,
-                features: processedFeatures
-            };
-            
-            geojsonLayer.addData(processedData);
-            
-            // Render daftar fasilitas
-            renderFacilityList();
-            
-            // Fit bounds ke seluruh data
-            if (geojsonLayer.getBounds().isValid()) {
-                map.fitBounds(geojsonLayer.getBounds());
-            }
-            
-            return geojsonLayer;
+        });
+        
+        if (radio.value === 'osm') {
+            osm.addTo(map);
+        } else if (radio.value === 'imagery') {
+            sat.addTo(map);
+        } else if (radio.value === 'topo') {
+            topo.addTo(map);
         }
-
-        // Inisialisasi layer GeoJSON dengan data
-        createGeoJSONLayer(facilitiesData);
-
-        // Fungsi untuk mengubah layer peta dasar
-        function changeBasemap(basemapType) {
-            // Hapus semua layer peta dasar
-            map.removeLayer(osmLayer);
-            map.removeLayer(satelliteLayer);
-            map.removeLayer(topoLayer);
-            
-            // Tambahkan layer yang dipilih
-            switch(basemapType) {
-                case 'osm':
-                    osmLayer.addTo(map);
-                    break;
-                case 'imagery':
-                    satelliteLayer.addTo(map);
-                    break;
-                case 'topo':
-                    topoLayer.addTo(map);
-                    break;
-            }
+        
+        // Re-add markers if they exist
+        if (window.markersLayer) {
+            markersLayer.addTo(map);
         }
+    };
+});
 
-        // Fungsi untuk menampilkan daftar fasilitas di sidebar
-        function renderFacilityList(filter = 'all') {
-            const facilityList = document.getElementById('facility-list');
-            facilityList.innerHTML = '';
+// === ICON FUNCTION ===
+function getIcon(category) {
+    const iconMap = {
+        wisata: 'fa-fish',
+        pertanian: 'fa-seedling',
+        energi: 'fa-bolt',
+        peternakan: 'fa-cow',
+        perkantoran: 'fa-building',
+        parkir: 'fa-parking',
+        akses: 'fa-door-open'
+    };
+    
+    const color = category === 'akses' ? '#e74c3c' : '#27ae60';
+    
+    return L.divIcon({
+        className: 'custom-marker',
+        html: `<i class="fa-solid ${iconMap[category] || 'fa-location-dot'}" style="color:${color}"></i>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30]
+    });
+}
+
+// === DATA ===
+const facilitiesData = {
+    "type": "FeatureCollection",
+    "name": "point_Fasil",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 0, 
+                "Nama": "Tempat Pemancingan 1", 
+                "Luas": 143.712551, 
+                "Lon": 110.431909, 
+                "Lat": -7.114901,
+                "category": "wisata",
+                "established": "2023",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/tempat%20mancing%201.jpeg?updatedAt=1768962099719",
+                "description": "Area pemancingan pertama di KHDTK Wanadipa UNDIP"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.431909045443035, -7.114901083659322 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 1, 
+                "Nama": "Tempat Parkir", 
+                "Luas": 266.864788, 
+                "Lon": 110.431933, 
+                "Lat": -7.115053,
+                "category": "parkir",
+                "established": "2023",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/tempat%20parkir.jpeg?updatedAt=1768962098594",
+                "description": "Area parkir untuk pengunjung dan kendaraan operasional"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.431933184280922, -7.115052871733886 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 2, 
+                "Nama": "GreenHouse Wanadipa", 
+                "Luas": 196.866377, 
+                "Lon": 110.432461, 
+                "Lat": -7.115798,
+                "category": "pertanian",
+                "established": "2023",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/greenhouse.jpeg?updatedAt=1768962098853",
+                "description": "Greenhouse untuk penelitian dan pengembangan tanaman"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.432461096587915, -7.11579765674825 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 4, 
+                "Nama": "Bale Wanadipa UNDIP", 
+                "Luas": 114.478135, 
+                "Lon": 110.432345, 
+                "Lat": -7.115683,
+                "category": "perkantoran",
+                "established": "2023",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/joglo.jpeg?updatedAt=1768962098502",
+                "description": "Bangunan utama untuk kegiatan administrasi dan pertemuan"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.432345411480142, -7.115682710676862 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 8, 
+                "Nama": "Kantor KHDTK UNDIP", 
+                "Luas": 228.811689, 
+                "Lon": 110.431931, 
+                "Lat": -7.115282,
+                "category": "perkantoran",
+                "established": "2022",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/kantor.jpeg?updatedAt=1768962098350",
+                "description": "Kantor pengelolaan KHDTK Wanadipa Universitas Diponegoro"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.431930736183801, -7.115281712980278 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 5, 
+                "Nama": "Mushola Al-Ikhlas", 
+                "Luas": 107.774981, 
+                "Lon": 110.431707, 
+                "Lat": -7.115212,
+                "category": "perkantoran",
+                "established": "2025",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/mushola.jpeg?updatedAt=1768962099287",
+                "description": "Tempat ibadah untuk pengunjung dan pengelola"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.43170710538692, -7.115211518839631 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 6, 
+                "Nama": "Microalgae Production Site", 
+                "Luas": 125.034447, 
+                "Lon": 110.432214, 
+                "Lat": -7.115537,
+                "category": "energi",
+                "established": "2022",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/microalgae.jpeg?updatedAt=1768962100112",
+                "description": "Area produksi mikroalga untuk penelitian bioenergi"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.432214305163527, -7.115537124667235 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 7, 
+                "Nama": "Tempat Pemancingan 2", 
+                "Luas": 173.79093, 
+                "Lon": 110.433359, 
+                "Lat": -7.116367,
+                "category": "wisata",
+                "established": "2023",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/tempat%20mancing%202.jpeg?updatedAt=1768962101420",
+                "description": "Area pemancingan kedua dengan spot yang berbeda"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.433358611054743, -7.116366596122383 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 9, 
+                "Nama": "Bioenergy Sites", 
+                "Luas": 146.96752, 
+                "Lon": 110.43209, 
+                "Lat": -7.115431,
+                "category": "energi",
+                "established": "2023",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/site%20production.jpeg?updatedAt=1768962100152",
+                "description": "Lokasi pengembangan energi terbarukan dari biomassa"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.432090235808261, -7.115431161228177 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 10, 
+                "Nama": "Kandang Sapi", 
+                "Luas": 472.327483, 
+                "Lon": 110.43119, 
+                "Lat": -7.115376,
+                "category": "peternakan",
+                "established": "2022",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/Kandang%20Sapi.jpeg",
+                "description": "Kandang sapi untuk penelitian peternakan terpadu"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.431189886369395, -7.115375727867813 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 13, 
+                "Nama": "Tempat Parkir Bawah", 
+                "Luas": 0, 
+                "Lon": 110.4333167, 
+                "Lat": -7.11615000,
+                "category": "parkir",
+                "established": "2024",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/parkir%20bawah.jpeg",
+                "description": "Area parkir untuk pengunjung dan kendaraan operasional"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.4333167, -7.11615000 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 14, 
+                "Nama": "Bedeng Proker KKN-T TIM 19", 
+                "Luas": 25.8, 
+                "Lon": 110.432551667, 
+                "Lat": -7.1157383333,
+                "category": "pertanian",
+                "established": "2026",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/bedeng.jpeg",
+                "description": "Bedeng berjumlah 6 dilengkapi dengan 4 sungkup serta kolam penampungan air hujan dan pipa pengairan menggunakan springkle untuk penyiraman tanaman"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.432551667, -7.1157383333 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 12, 
+                "Nama": "Kandang Kambing", 
+                "Luas": 26.172454, 
+                "Lon": 110.4324, 
+                "Lat": -7.1151,
+                "category": "peternakan",
+                "established": "2024",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/Kandang%20Kambing%20(2).jpeg",
+                "description": "Kandang kambing untuk penelitian peternakan terpadu"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.4324, -7.1151 ] 
+            } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 11, 
+                "Nama": "Gerbang Masuk Kawasan KHDTK Wanadipa UNDIP", 
+                "Luas": null, 
+                "Lon": 110.431709, 
+                "Lat": -7.114327,
+                "category": "akses",
+                "established": "2020",
+                "photo": "https://ik.imagekit.io/amddil/foto%20fasilitas/pintu%20masuk.jpeg?updatedAt=1768962098508",
+                "description": "Gerbang utama masuk ke kawasan KHDTK Wanadipa"
+            }, 
+            "geometry": { 
+                "type": "Point", 
+                "coordinates": [ 110.431709041670018, -7.114327063128224 ] 
+            } 
+        }
+    ]
+};
+
+// === GLOBAL VARIABLES ===
+let markersLayer = L.layerGroup().addTo(map);
+let routingControl = null;
+let activeFacilityId = null;
+
+// === LOAD FACILITIES ===
+function loadFacilities() {
+    // Show loading
+    document.getElementById('loading').style.display = 'block';
+    
+    // Clear existing markers
+    markersLayer.clearLayers();
+    
+    // Get filter values
+    const filterType = document.getElementById('filter-type').value;
+    const searchText = document.getElementById('search-facility').value.toLowerCase();
+    
+    // Filter facilities
+    const filteredFeatures = facilitiesData.features.filter(feature => {
+        const matchesCategory = filterType === 'all' || feature.properties.category === filterType;
+        const matchesSearch = searchText === '' || 
+            feature.properties.Nama.toLowerCase().includes(searchText) ||
+            feature.properties.description.toLowerCase().includes(searchText);
+        
+        return matchesCategory && matchesSearch;
+    });
+    
+    // Update visible facilities count
+    document.getElementById('visible-facilities').textContent = filteredFeatures.length;
+    
+    // Add markers to map
+    filteredFeatures.forEach(feature => {
+        const props = feature.properties;
+        const coords = feature.geometry.coordinates;
+        
+        const marker = L.marker([coords[1], coords[0]], {
+            icon: getIcon(props.category)
+        }).addTo(markersLayer);
+        
+        // Create popup content
+        const popupContent = `
+            <div class="popup-content">
+                <h3>${props.Nama}</h3>
+                <div class="badge">${props.category.toUpperCase()}</div>
+                <div class="popup-details">
+                    <div><i class="fa-solid fa-calendar"></i> <strong>Dibangun:</strong> ${props.established}</div>
+                    ${props.Luas ? `<div><i class="fa-solid fa-ruler-combined"></i> <strong>Luas:</strong> ${props.Luas.toFixed(2)} m²</div>` : ''}
+                    <div><i class="fa-solid fa-location-dot"></i> <strong>Koordinat:</strong> ${props.Lat.toFixed(6)}, ${props.Lon.toFixed(6)}</div>
+                </div>
+                <p>${props.description}</p>
+                ${props.photo ? `<img src="${props.photo}" alt="${props.Nama}">` : ''}
+            </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+        
+        // Add click event
+        marker.on('click', function() {
+            // Highlight in sidebar list
+            highlightFacilityInList(props.id);
             
-            if (!geojsonLayer) return;
+            // Center map on marker
+            map.setView([coords[1], coords[0]], 18);
             
-            const layers = geojsonLayer.getLayers();
+            // Open popup
+            this.openPopup();
+        });
+        
+        // Add to sidebar list
+        addFacilityToList(props);
+    });
+    
+    // Hide loading
+    setTimeout(() => {
+        document.getElementById('loading').style.display = 'none';
+    }, 500);
+}
+
+// === ADD FACILITY TO SIDEBAR LIST ===
+function addFacilityToList(props) {
+    const facilityList = document.getElementById('facility-list');
+    
+    const facilityItem = document.createElement('div');
+    facilityItem.className = 'facility-item';
+    facilityItem.id = `facility-${props.id}`;
+    facilityItem.dataset.id = props.id;
+    
+    // Get icon for category
+    const iconMap = {
+        wisata: 'fa-fish',
+        pertanian: 'fa-seedling',
+        energi: 'fa-bolt',
+        peternakan: 'fa-cow',
+        perkantoran: 'fa-building',
+        parkir: 'fa-parking',
+        akses: 'fa-door-open'
+    };
+    
+    facilityItem.innerHTML = `
+        <div>
+            <div class="facility-name">${props.Nama}</div>
+            <div class="facility-category">${props.category}</div>
+        </div>
+        <div class="facility-icon">
+            <i class="fa-solid ${iconMap[props.category] || 'fa-location-dot'}"></i>
+        </div>
+    `;
+    
+    // Add click event
+    facilityItem.addEventListener('click', function() {
+        const id = parseInt(this.dataset.id);
+        const feature = facilitiesData.features.find(f => f.properties.id === id);
+        
+        if (feature) {
+            const coords = feature.geometry.coordinates;
+            map.setView([coords[1], coords[0]], 18);
             
-            layers.forEach(layer => {
-                const feature = layer.feature;
-                if (!feature) return;
-                
-                const props = feature.properties;
-                
-                // Filter berdasarkan kategori
-                if (filter !== 'all' && props.category !== filter) {
-                    return;
-                }
-                
-                const facilityItem = document.createElement('div');
-                facilityItem.className = 'facility-item';
-                facilityItem.dataset.id = props.id || props.Nama;
-                
-                // Tentukan ikon berdasarkan kategori
-                let iconClass;
-                switch(props.category) {
-                    case 'perkantoran': iconClass = 'fas fa-building'; break;
-                    case 'wisata': iconClass = 'fas fa-fish'; break;
-                    case 'parkir': iconClass = 'fas fa-parking'; break;
-                    case 'pertanian': iconClass = 'fas fa-seedling'; break;
-                    case 'energi': iconClass = 'fas fa-solar-panel'; break;
-                    case 'peternakan': iconClass = 'fas fa-cow'; break;
-                    case 'akses': iconClass = 'fas fa-door-open'; break;
-                    default: iconClass = 'fas fa-map-marker-alt';
-                }
-                
-                facilityItem.innerHTML = `
-                    <h4><i class="${iconClass}"></i> ${props.Nama}</h4>
-                    <p><strong>Kategori:</strong> ${props.category} | <strong>Luas:</strong> ${props.Luas ? props.Luas.toFixed(2) + ' m²' : '-'}</p>
-                    <p>${props.description ? props.description.substring(0, 60) + '...' : 'Tidak ada deskripsi'}</p>
-                `;
-                
-                // Tambahkan event listener
-                facilityItem.addEventListener('click', function() {
-                    // Buka popup
-                    if (layer.openPopup) {
+            // Find and open marker popup
+            markersLayer.eachLayer(layer => {
+                if (layer instanceof L.Marker) {
+                    const latlng = layer.getLatLng();
+                    if (latlng.lat === coords[1] && latlng.lng === coords[0]) {
                         layer.openPopup();
                     }
-                    
-                    // Zoom ke fitur
-                    if (layer.getLatLng) {
-                        map.setView(layer.getLatLng(), 18);
-                    }
-                    
-                    // Highlight di sidebar
-                    highlightFacilityInList(props.id || props.Nama);
-                });
-                
-                facilityList.appendChild(facilityItem);
-            });
-        }
-
-        // Fungsi untuk menyorot fasilitas di sidebar
-        function highlightFacilityInList(id) {
-            // Hapus kelas active dari semua item
-            document.querySelectorAll('.facility-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Tambahkan kelas active ke item yang dipilih
-            const selectedItem = document.querySelector(`.facility-item[data-id="${id}"]`);
-            if (selectedItem) {
-                selectedItem.classList.add('active');
-            }
-        }
-
-        // Fungsi untuk mendapatkan lokasi pengguna
-        function locateUser() {
-            if (!navigator.geolocation) {
-                alert('Geolokasi tidak didukung oleh browser Anda.');
-                return;
-            }
-            
-            // Hapus marker lokasi sebelumnya jika ada
-            if (userLocationMarker) {
-                map.removeLayer(userLocationMarker);
-            }
-            
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const userLat = position.coords.latitude;
-                    const userLng = position.coords.longitude;
-                    
-                    // Tambahkan marker lokasi pengguna
-                    userLocationMarker = L.marker([userLat, userLng], {
-                        icon: L.divIcon({
-                            className: 'user-location-marker',
-                            html: '<i class="fas fa-circle" style="color:#27ae60; font-size:20px;"></i><i class="fas fa-user" style="color:white; font-size:10px; position:absolute; left:5px; top:5px;"></i>',
-                            iconSize: [20, 20]
-                        })
-                    }).addTo(map);
-                    
-                    // Buka popup
-                    userLocationMarker.bindPopup('<b>Lokasi Anda</b><br>Anda berada di sini.').openPopup();
-                    
-                    // Zoom ke lokasi pengguna
-                    map.setView([userLat, userLng], 16);
-                },
-                function(error) {
-                    alert('Tidak dapat mengambil lokasi: ' + error.message);
                 }
-            );
+            });
+            
+            highlightFacilityInList(id);
         }
+    });
+    
+    facilityList.appendChild(facilityItem);
+}
 
-        // Fungsi untuk menghitung rute ke Gerbang Utama
-        function calculateRouteToGate() {
-            // Periksa apakah ada koordinat gerbang
-            if (!gateCoordinates) {
-                alert('Koordinat Gerbang Utama tidak ditemukan.');
-                return;
-            }
-            
-            // Hapus rute sebelumnya jika ada
-            if (routingControl) {
-                map.removeControl(routingControl);
-                routingControl = null;
-            }
-            
-            const targetCoords = L.latLng(gateCoordinates[1], gateCoordinates[0]);
-            
-            // Jika lokasi pengguna sudah ada, gunakan itu
-            if (userLocationMarker) {
-                const userCoords = userLocationMarker.getLatLng();
+// === HIGHLIGHT FACILITY IN LIST ===
+function highlightFacilityInList(id) {
+    // Remove active class from all items
+    document.querySelectorAll('.facility-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Add active class to selected item
+    const selectedItem = document.getElementById(`facility-${id}`);
+    if (selectedItem) {
+        selectedItem.classList.add('active');
+        selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    activeFacilityId = id;
+}
+
+// === INITIALIZE ===
+function init() {
+    // Load facilities
+    loadFacilities();
+    
+    // Add event listeners
+    document.getElementById('filter-type').addEventListener('change', loadFacilities);
+    document.getElementById('search-facility').addEventListener('input', loadFacilities);
+    
+    // Location button
+    document.getElementById('btn-locate').addEventListener('click', function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
                 
-                // Buat rute
+                L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        className: 'custom-marker',
+                        html: '<i class="fa-solid fa-circle-user" style="color:#3498db;font-size:24px"></i>',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 30]
+                    })
+                }).addTo(map).bindPopup('Lokasi Anda').openPopup();
+                
+                map.setView([lat, lng], 16);
+            }, function() {
+                alert('Tidak dapat mengakses lokasi Anda. Pastikan izin lokasi diaktifkan.');
+            });
+        } else {
+            alert('Browser Anda tidak mendukung geolokasi.');
+        }
+    });
+    
+    // Route to main gate button
+    document.getElementById('btn-route').addEventListener('click', function() {
+        // Find main gate (akses category)
+        const mainGate = facilitiesData.features.find(f => f.properties.category === 'akses');
+        
+        if (mainGate && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+                const gateCoords = mainGate.geometry.coordinates;
+                
+                // Clear existing route
+                if (routingControl) {
+                    map.removeControl(routingControl);
+                }
+                
+                // Create new route
                 routingControl = L.Routing.control({
                     waypoints: [
-                        L.latLng(userCoords.lat, userCoords.lng),
-                        targetCoords
+                        L.latLng(userLat, userLng),
+                        L.latLng(gateCoords[1], gateCoords[0])
                     ],
                     routeWhileDragging: false,
-                    showAlternatives: false,
                     lineOptions: {
-                        styles: [{color: '#27ae60', weight: 5}]
+                        styles: [{ color: '#27ae60', weight: 5, opacity: 0.7 }]
                     },
-                    createMarker: function() { return null; }
+                    createMarker: function() { return null; }, // No markers for waypoints
+                    showAlternatives: false
                 }).addTo(map);
                 
-                // Tambahkan judul rute
-                routingControl.on('routesfound', function(e) {
-                    const routes = e.routes;
-                    const summary = routes[0].summary;
-                    alert(`Rute ke Gerbang Utama KHDTK Wanadipa ditemukan!\n\nJarak: ${(summary.totalDistance / 1000).toFixed(2)} km\nWaktu tempuh: ${(summary.totalTime / 60).toFixed(0)} menit`);
-                });
-                
-            } else {
-                // Minta lokasi pengguna terlebih dahulu
-                if (!navigator.geolocation) {
-                    alert('Geolokasi tidak didukung. Tidak dapat menghitung rute.');
-                    return;
-                }
-                
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        const userLat = position.coords.latitude;
-                        const userLng = position.coords.longitude;
-                        
-                        // Tambahkan marker lokasi pengguna
-                        userLocationMarker = L.marker([userLat, userLng], {
-                            icon: L.divIcon({
-                                className: 'user-location-marker',
-                                html: '<i class="fas fa-circle" style="color:#27ae60; font-size:20px;"></i><i class="fas fa-user" style="color:white; font-size:10px; position:absolute; left:5px; top:5px;"></i>',
-                                iconSize: [20, 20]
-                            })
-                        }).addTo(map);
-                        
-                        // Buat rute
-                        routingControl = L.Routing.control({
-                            waypoints: [
-                                L.latLng(userLat, userLng),
-                                targetCoords
-                            ],
-                            routeWhileDragging: false,
-                            showAlternatives: false,
-                            lineOptions: {
-                                styles: [{color: '#27ae60', weight: 5}]
-                            },
-                            createMarker: function() { return null; }
-                        }).addTo(map);
-                        
-                        // Tambahkan judul rute
-                        routingControl.on('routesfound', function(e) {
-                            const routes = e.routes;
-                            const summary = routes[0].summary;
-                            alert(`Rute ke Gerbang Utama KHDTK Wanadipa ditemukan!\n\nJarak: ${(summary.totalDistance / 1000).toFixed(2)} km\nWaktu tempuh: ${(summary.totalTime / 60).toFixed(0)} menit`);
-                        });
-                    },
-                    function(error) {
-                        alert('Tidak dapat mengambil lokasi untuk menghitung rute: ' + error.message);
-                    }
-                );
-            }
-        }
-
-        // Fungsi untuk menghapus rute
-        function clearRoute() {
-            if (routingControl) {
-                map.removeControl(routingControl);
-                routingControl = null;
-            }
-        }
-
-        // Fungsi untuk mengunduh data GeoJSON
-        function downloadGeoJSON() {
-            // Kumpulkan semua data dari layer
-            const features = [];
-            geojsonLayer.eachLayer(function(layer) {
-                if (layer.feature) {
-                    features.push(layer.feature);
-                }
+                // Center map on route
+                map.fitBounds([
+                    [userLat, userLng],
+                    [gateCoords[1], gateCoords[0]]
+                ]);
+            }, function() {
+                alert('Tidak dapat mengakses lokasi Anda untuk membuat rute.');
             });
-            
-            const dataToExport = {
-                type: "FeatureCollection",
-                name: "fasilitas_khdtk_wanadipa",
-                crs: { type: "name", properties: { name: "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-                features: features
-            };
-            
-            // Konversi data ke string JSON
-            const dataStr = JSON.stringify(dataToExport, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            // Buat elemen tautan unduhan
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', 'fasilitas_khdtk_wanadipa.geojson');
-            linkElement.click();
+        } else if (!mainGate) {
+            alert('Gerbang utama tidak ditemukan dalam data.');
+        } else {
+            alert('Browser Anda tidak mendukung geolokasi.');
         }
-
-        // Event listeners untuk basemap radio buttons
-        document.querySelectorAll('input[name="basemap"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                changeBasemap(this.value);
-            });
-        });
-
-        // Event listener untuk filter
-        document.getElementById('filter-type').addEventListener('change', function() {
-            renderFacilityList(this.value);
-        });
-
-        // Event listener untuk pencarian
-        document.getElementById('search-facility').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const facilityItems = document.querySelectorAll('.facility-item');
-            
-            facilityItems.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-
-        // Event listener untuk tombol lokasi
-        document.getElementById('btn-locate').addEventListener('click', locateUser);
-
-        // Event listener untuk tombol rute
-        document.getElementById('btn-route').addEventListener('click', calculateRouteToGate);
-
-        // Event listener untuk tombol hapus rute
-        document.getElementById('btn-clear-route').addEventListener('click', clearRoute);
-
-        // Event listener untuk tombol zoom in
-        document.getElementById('btn-zoom-in').addEventListener('click', function() {
-            map.zoomIn();
-        });
-
-        // Event listener untuk tombol zoom out
-        document.getElementById('btn-zoom-out').addEventListener('click', function() {
-            map.zoomOut();
-        });
-
-        // Event listener untuk tombol fullscreen
-        document.getElementById('btn-fullscreen').addEventListener('click', function() {
-            const elem = document.getElementById('map-container');
-            
-            if (!document.fullscreenElement) {
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) {
-                    elem.msRequestFullscreen();
-                }
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
+    });
+    
+    // Clear route button
+    document.getElementById('btn-clear-route').addEventListener('click', function() {
+        if (routingControl) {
+            map.removeControl(routingControl);
+            routingControl = null;
+        }
+    });
+    
+    // Map control buttons
+    document.getElementById('btn-zoom-in').addEventListener('click', function() {
+        map.zoomIn();
+    });
+    
+    document.getElementById('btn-zoom-out').addEventListener('click', function() {
+        map.zoomOut();
+    });
+    
+    document.getElementById('btn-fullscreen').addEventListener('click', function() {
+        const elem = document.getElementById('map-container');
+        
+        if (!document.fullscreenElement) {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
             }
-        });
+            
+            this.innerHTML = '<i class="fa-solid fa-compress"></i>';
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+            
+            this.innerHTML = '<i class="fa-solid fa-expand"></i>';
+        }
+    });
+    
+    // Update fullscreen button when exiting fullscreen
+    document.addEventListener('fullscreenchange', function() {
+        const btn = document.getElementById('btn-fullscreen');
+        if (!document.fullscreenElement) {
+            btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+        }
+    });
+}
 
-        // Event listener untuk tombol unduh
-        document.getElementById('btn-download').addEventListener('click', downloadGeoJSON);
-
-        // Render daftar fasilitas awal
-        renderFacilityList();
-    </script>
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
