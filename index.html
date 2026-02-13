@@ -1302,6 +1302,7 @@ input:checked + .slider:before {
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
 <script>
+    
 // === TUTORIAL SYSTEM ===
 const Tutorial = {
     overlay: document.getElementById('tutorial-overlay'),
@@ -1314,18 +1315,21 @@ const Tutorial = {
     totalSteps: 4,
     
     init() {
-        // Check if user has seen tutorial before
         const hasSeenTutorial = localStorage.getItem('khdtk-tutorial-seen');
         if (!hasSeenTutorial) {
             setTimeout(() => this.show(), 500);
             localStorage.setItem('khdtk-tutorial-seen', 'true');
         }
         
-        // Event listeners
         document.getElementById('btn-show-tutorial').addEventListener('click', () => this.show());
         
         this.prevBtn.addEventListener('click', () => this.prevStep());
         this.nextBtn.addEventListener('click', () => this.nextStep());
+        
+        // 🟢 FIX: Tombol Mulai Jelajah sekarang bisa diklik dan menutup tutorial
+        if (this.startBtn) {
+            this.startBtn.addEventListener('click', () => this.hide());
+        }
         
         this.dots.forEach(dot => {
             dot.addEventListener('click', (e) => {
@@ -1333,8 +1337,6 @@ const Tutorial = {
                 this.goToStep(step);
             });
         });
-        
-        // Close on overlay click? Better not, use button only
     },
     
     show() {
@@ -1349,11 +1351,9 @@ const Tutorial = {
     goToStep(step) {
         this.currentStep = step;
         
-        // Update steps visibility
         this.steps.forEach(s => s.classList.remove('active'));
         document.getElementById(`step-${step}`).classList.add('active');
         
-        // Update dots
         this.dots.forEach((dot, i) => {
             if (i + 1 === step) {
                 dot.classList.add('active');
@@ -1362,7 +1362,6 @@ const Tutorial = {
             }
         });
         
-        // Update buttons
         this.prevBtn.disabled = step === 1;
         
         if (step === this.totalSteps) {
@@ -1376,15 +1375,11 @@ const Tutorial = {
     },
     
     prevStep() {
-        if (this.currentStep > 1) {
-            this.goToStep(this.currentStep - 1);
-        }
+        if (this.currentStep > 1) this.goToStep(this.currentStep - 1);
     },
     
     nextStep() {
-        if (this.currentStep < this.totalSteps) {
-            this.goToStep(this.currentStep + 1);
-        }
+        if (this.currentStep < this.totalSteps) this.goToStep(this.currentStep + 1);
     }
 };
 
