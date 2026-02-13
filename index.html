@@ -27,6 +27,8 @@
     --warning: #f39c12;
     --info: #3498db;
     --success: #27ae60;
+    --tutorial-bg: rgba(0, 0, 0, 0.85);
+    --tutorial-card: #ffffff;
 }
 
 * {
@@ -63,6 +65,7 @@ body {
     text-align: center;
     margin-bottom: 0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
 .logo-container {
@@ -107,6 +110,7 @@ body {
     box-shadow: 0 6px 20px var(--shadow);
     border: 1px solid var(--border);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
 }
 
 .section:hover {
@@ -128,6 +132,333 @@ body {
 
 .section-title i {
     font-size: 1.1rem;
+}
+
+/* ===== TUTORIAL BUTTON ===== */
+.tutorial-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 1002;
+}
+
+.tutorial-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* ===== TUTORIAL OVERLAY ===== */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.tutorial-overlay.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tutorial-card {
+    background: var(--tutorial-card);
+    border-radius: 24px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.tutorial-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 25px 30px;
+    border-radius: 24px 24px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.tutorial-header i {
+    font-size: 2.5rem;
+}
+
+.tutorial-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.tutorial-header p {
+    margin: 5px 0 0;
+    opacity: 0.9;
+}
+
+.tutorial-content {
+    padding: 30px;
+}
+
+.tutorial-step {
+    display: none;
+}
+
+.tutorial-step.active {
+    display: block;
+}
+
+.tutorial-step h3 {
+    color: var(--primary);
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tutorial-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 25px 0;
+}
+
+.tutorial-feature-item {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 16px;
+    border-left: 4px solid var(--accent);
+    transition: all 0.3s;
+}
+
+.tutorial-feature-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.tutorial-feature-item i {
+    font-size: 1.8rem;
+    color: var(--accent);
+    margin-bottom: 10px;
+}
+
+.tutorial-feature-item h4 {
+    margin: 10px 0 5px;
+    font-size: 1.1rem;
+}
+
+.tutorial-feature-item p {
+    margin: 0;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.tutorial-highlight {
+    background: #fff9e6;
+    border: 2px solid var(--warning);
+    box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.1);
+    position: relative;
+    z-index: 10000;
+    transition: all 0.3s;
+}
+
+.tutorial-highlight::after {
+    content: '👆';
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background: var(--warning);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.tutorial-image-demo {
+    background: linear-gradient(145deg, #f0f7f4, #ffffff);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 25px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.demo-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.demo-marker i {
+    font-size: 2rem;
+    color: var(--accent);
+    text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    animation: pulse 2s infinite;
+}
+
+.demo-marker span {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.demo-popup {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    max-width: 250px;
+    position: relative;
+}
+
+.demo-popup::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 20px;
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: white transparent transparent;
+}
+
+.tutorial-footer {
+    padding: 20px 30px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tutorial-progress {
+    display: flex;
+    gap: 8px;
+}
+
+.progress-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ddd;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.progress-dot.active {
+    background: var(--accent);
+    transform: scale(1.3);
+}
+
+.tutorial-nav-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tutorial-nav-btn:hover {
+    background: var(--primary);
+    transform: translateX(5px);
+}
+
+.tutorial-nav-btn.secondary {
+    background: #95a5a6;
+}
+
+.tutorial-nav-btn.secondary:hover {
+    background: #7f8c8d;
+}
+
+.tooltip-marker {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-marker:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    transition: opacity 0.3s;
+    z-index: 10001;
+    pointer-events: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.tooltip-text::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--text) transparent transparent transparent;
 }
 
 /* ===== FORM ===== */
@@ -371,6 +702,15 @@ button:active {
     
     #map-container {
         height: 50vh;
+    }
+    
+    .tutorial-card {
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .tutorial-header h2 {
+        font-size: 1.3rem;
     }
 }
 
@@ -629,6 +969,9 @@ input:checked + .slider:before {
 <!-- ===== SIDEBAR ===== -->
 <div id="sidebar">
     <div class="hero">
+        <button class="tutorial-btn" id="btn-show-tutorial" title="Bantuan & Tutorial">
+            <i class="fa-solid fa-question"></i>
+        </button>
         <div class="logo-container">
             <img src="https://ik.imagekit.io/amddil/foto%20fasilitas/logo_undip-removebg-preview.png" alt="Logo UNDIP">
             <img src="https://ik.imagekit.io/amddil/foto%20fasilitas/KKN%20TEMATIK%20UNDIP.png" alt="Logo KKN Tematik">
@@ -653,7 +996,7 @@ input:checked + .slider:before {
     </div>
     
     <div class="sidebar-content">
-        <div class="section">
+        <div class="section" id="section-basemap">
             <div class="section-title"><i class="fa-solid fa-layer-group"></i> Peta Dasar</div>
             <div class="radio-group">
                 <label class="radio-label">
@@ -668,7 +1011,7 @@ input:checked + .slider:before {
             </div>
             
             <!-- Toggle Batas Kawasan -->
-            <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+            <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;" id="toggle-boundary-container">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-boundary" style="color: var(--primary);"></i>
@@ -686,7 +1029,7 @@ input:checked + .slider:before {
             </div>
         </div>
 
-        <div class="section">
+        <div class="section" id="section-filter">
             <div class="section-title"><i class="fa-solid fa-filter"></i> Filter Fasilitas</div>
             <select id="filter-type">
                 <option value="all">Semua Fasilitas</option>
@@ -702,14 +1045,14 @@ input:checked + .slider:before {
             <button id="btn-locate"><i class="fa-solid fa-location-crosshairs"></i> Lokasi Saya</button>
         </div>
 
-        <div class="section">
+        <div class="section" id="section-facility-list">
             <div class="section-title"><i class="fa-solid fa-list"></i> Daftar Fasilitas</div>
             <div class="facility-list" id="facility-list">
                 <!-- Facility items will be generated here -->
             </div>
         </div>
 
-        <div class="section">
+        <div class="section" id="section-navigation">
             <div class="section-title"><i class="fa-solid fa-route"></i> Navigasi</div>
             <button id="btn-route"><i class="fa-solid fa-directions"></i> Rute ke Gerbang Utama</button>
             <button id="btn-clear-route" style="background: linear-gradient(to right, #e74c3c, #c0392b); margin-top: 10px;">
@@ -718,7 +1061,7 @@ input:checked + .slider:before {
         </div>
 
         <!-- LEGENDA BLOK KHDTK -->
-        <div class="section">
+        <div class="section" id="section-legend">
             <div class="section-title"><i class="fa-solid fa-map"></i> Legenda Blok KHDTK</div>
             <div class="legend" id="legend-blocks">
                 <!-- Legend items will be generated here -->
@@ -749,10 +1092,302 @@ input:checked + .slider:before {
     </div>
 </div>
 
+<!-- ===== TUTORIAL OVERLAY ===== -->
+<div class="tutorial-overlay" id="tutorial-overlay">
+    <div class="tutorial-card">
+        <div class="tutorial-header">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <div>
+                <h2>✨ Tutorial WebGIS</h2>
+                <p>Panduan lengkap menggunakan KHDTK Wanadipa WebGIS</p>
+            </div>
+        </div>
+        
+        <div class="tutorial-content">
+            <!-- STEP 1: SELAMAT DATANG -->
+            <div class="tutorial-step active" id="step-1">
+                <h3><i class="fa-solid fa-hand-wave" style="color: var(--primary);"></i> Selamat Datang!</h3>
+                <p style="font-size: 1.1rem; margin-bottom: 25px;">WebGIS KHDTK Wanadipa adalah platform untuk melihat dan menjelajahi fasilitas serta blok kawasan hutan dengan tujuan khusus di UNDIP.</p>
+                
+                <div class="tutorial-image-demo">
+                    <div class="demo-marker">
+                        <i class="fa-solid fa-tree"></i>
+                        <span>Blok Kawasan</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="color: var(--text-light);"></i>
+                    <div class="demo-marker">
+                        <i class="fa-solid fa-fish"></i>
+                        <span>Fasilitas</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="color: var(--text-light);"></i>
+                    <div class="demo-marker">
+                        <i class="fa-solid fa-route"></i>
+                        <span>Navigasi</span>
+                    </div>
+                </div>
+                
+                <div style="background: #e8f5e9; padding: 20px; border-radius: 16px; margin: 25px 0;">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <i class="fa-solid fa-lightbulb" style="font-size: 2rem; color: var(--warning);"></i>
+                        <div>
+                            <strong style="font-size: 1rem;">💡 Fitur Unggulan:</strong>
+                            <ul style="margin: 10px 0 0; padding-left: 20px;">
+                                <li>Visualisasi 5 blok kawasan dengan warna berbeda</li>
+                                <li>14+ fasilitas dengan foto dan informasi detail</li>
+                                <li>Navigasi rute menuju gerbang utama</li>
+                                <li>Filter dan pencarian fasilitas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STEP 2: CARA MELIHAT POPUP -->
+            <div class="tutorial-step" id="step-2">
+                <h3><i class="fa-solid fa-popup" style="color: var(--primary);"></i> Cara Melihat Informasi (Popup)</h3>
+                
+                <div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap; margin-bottom: 25px;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <p style="font-size: 1rem;"><strong>📌 Pada Fasilitas:</strong></p>
+                        <ol style="margin-bottom: 20px;">
+                            <li style="margin-bottom: 10px;">Klik icon <i class="fa-solid fa-fish" style="color: var(--accent);"></i> <strong>(marker)</strong> di peta</li>
+                            <li style="margin-bottom: 10px;">Popup akan muncul dengan info lengkap:</li>
+                        </ol>
+                        
+                        <div class="demo-popup" style="margin-left: 20px;">
+                            <h4 style="margin: 0 0 5px; color: var(--primary);">Tempat Pemancingan 1</h4>
+                            <span class="badge" style="background: var(--accent);">WISATA</span>
+                            <div style="margin-top: 10px;">
+                                <div><i class="fa-solid fa-calendar"></i> Dibangun: 2023</div>
+                                <div><i class="fa-solid fa-ruler-combined"></i> Luas: 143.71 m²</div>
+                                <p style="margin-top: 10px;">Area pemancingan pertama di KHDTK...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; min-width: 250px;">
+                        <p style="font-size: 1rem;"><strong>🗺️ Pada Blok Kawasan:</strong></p>
+                        <ol style="margin-bottom: 20px;">
+                            <li style="margin-bottom: 10px;">Klik area <strong>polygon berwarna</strong> di peta</li>
+                            <li style="margin-bottom: 10px;">Atau klik item di <strong>Legenda Blok</strong></li>
+                        </ol>
+                        
+                        <div class="demo-popup" style="margin-left: 20px; border-left: 4px solid #3498db;">
+                            <h4 style="margin: 0 0 5px; color: #3498db;">Blok Riset - Edukasi</h4>
+                            <span class="badge" style="background: #3498db;">Ditetapkan 2020</span>
+                            <div style="margin-top: 10px;">
+                                <div><i class="fa-solid fa-ruler-combined"></i> Luas: 4.2 Ha</div>
+                                <div><i class="fa-solid fa-leaf"></i> Vegetasi: Campuran</div>
+                                <p style="margin-top: 10px;">Blok untuk penelitian sivitas akademika...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: #fff3cd; padding: 15px; border-radius: 12px; margin-top: 15px;">
+                    <i class="fa-solid fa-hand-pointer" style="color: #856404;"></i> 
+                    <strong>Tip:</strong> Klik pada legenda blok di sidebar untuk langsung zoom ke area blok tersebut!
+                </div>
+            </div>
+            
+            <!-- STEP 3: FITUR-FITUR UTAMA -->
+            <div class="tutorial-step" id="step-3">
+                <h3><i class="fa-solid fa-toolbox" style="color: var(--primary);"></i> Fitur-Fitur WebGIS</h3>
+                
+                <div class="tutorial-features">
+                    <div class="tutorial-feature-item">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <h4>Peta Dasar</h4>
+                        <p>Ganti tampilan peta antara OpenStreetMap, Citra Satelit, dan Topografi</p>
+                    </div>
+                    <div class="tutorial-feature-item">
+                        <i class="fa-solid fa-filter"></i>
+                        <h4>Filter Fasilitas</h4>
+                        <p>Pilih kategori fasilitas yang ingin ditampilkan (wisata, parkir, dll)</p>
+                    </div>
+                    <div class="tutorial-feature-item">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <h4>Pencarian</h4>
+                        <p>Cari fasilitas berdasarkan nama atau deskripsi</p>
+                    </div>
+                    <div class="tutorial-feature-item">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        <h4>Lokasi Saya</h4>
+                        <p>Menampilkan posisi Anda saat ini di peta</p>
+                    </div>
+                    <div class="tutorial-feature-item">
+                        <i class="fa-solid fa-route"></i>
+                        <h4>Navigasi Rute</h4>
+                        <p>Buat rute dari lokasi Anda menuju gerbang utama</p>
+                    </div>
+                    <div class="tutorial-feature-item">
+                        <i class="fa-solid fa-boundary"></i>
+                        <h4>Toggle Batas</h4>
+                        <p>Nyalakan/matikan tampilan batas blok kawasan</p>
+                    </div>
+                    <div class="tutorial-feature-item">
+                        <i class="fa-solid fa-list"></i>
+                        <h4>Daftar Fasilitas</h4>
+                        <p>Klik daftar untuk langsung zoom ke fasilitas</p>
+                    </div>
+                    <div class="tutorial-feature-item">
+                        <i class="fa-solid fa-map"></i>
+                        <h4>Legenda Blok</h4>
+                        <p>Info lengkap 5 blok KHDTK dengan warna khas</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STEP 4: CONTOH PENGGUNAAN -->
+            <div class="tutorial-step" id="step-4">
+                <h3><i class="fa-solid fa-compass" style="color: var(--primary);"></i> Contoh Skenario Penggunaan</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 12px;">
+                        <div style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</div>
+                        <div>
+                            <strong>Mencari lokasi greenhouse:</strong>
+                            <p style="margin: 5px 0 0; color: var(--text-light);">Ketik "GreenHouse" di kolom pencarian → Klik marker hijau di peta → Lihat foto dan info lengkap</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 12px;">
+                        <div style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</div>
+                        <div>
+                            <strong>Melihat blok penelitian:</strong>
+                            <p style="margin: 5px 0 0; color: var(--text-light);">Klik legenda "Blok Riset - Edukasi" → Peta otomatis zoom ke area blok → Klik area untuk info detail</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; background: #f8f9fa; padding: 15px; border-radius: 12px;">
+                        <div style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</div>
+                        <div>
+                            <strong>Membuat rute pulang:</strong>
+                            <p style="margin: 5px 0 0; color: var(--text-light);">Klik "Rute ke Gerbang Utama" → Izinkan akses lokasi → Lihat jalur hijau menuju pintu keluar</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: linear-gradient(145deg, #f0f7f4, #ffffff); border-radius: 16px; text-align: center;">
+                    <i class="fa-solid fa-rocket" style="font-size: 2rem; color: var(--accent); margin-bottom: 10px;"></i>
+                    <h4 style="margin: 0 0 10px;">Siap menjelajahi KHDTK Wanadipa?</h4>
+                    <p style="margin: 0; color: var(--text-light);">Gunakan tutorial ini sebagai panduan, atau klik tombol "?" kapan saja untuk membuka kembali bantuan.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tutorial-footer">
+            <div class="tutorial-progress" id="tutorial-progress">
+                <div class="progress-dot active" data-step="1"></div>
+                <div class="progress-dot" data-step="2"></div>
+                <div class="progress-dot" data-step="3"></div>
+                <div class="progress-dot" data-step="4"></div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="tutorial-nav-btn secondary" id="btn-tutorial-prev" disabled>
+                    <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+                </button>
+                <button class="tutorial-nav-btn" id="btn-tutorial-next">
+                    Selanjutnya <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <button class="tutorial-nav-btn" id="btn-tutorial-start" style="background: var(--primary); display: none;">
+                    <i class="fa-solid fa-play"></i> Mulai Jelajah
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
 <script>
+// === TUTORIAL SYSTEM ===
+const Tutorial = {
+    overlay: document.getElementById('tutorial-overlay'),
+    steps: document.querySelectorAll('.tutorial-step'),
+    dots: document.querySelectorAll('.progress-dot'),
+    prevBtn: document.getElementById('btn-tutorial-prev'),
+    nextBtn: document.getElementById('btn-tutorial-next'),
+    startBtn: document.getElementById('btn-tutorial-start'),
+    currentStep: 1,
+    totalSteps: 4,
+    
+    init() {
+        // Check if user has seen tutorial before
+        const hasSeenTutorial = localStorage.getItem('khdtk-tutorial-seen');
+        if (!hasSeenTutorial) {
+            setTimeout(() => this.show(), 500);
+            localStorage.setItem('khdtk-tutorial-seen', 'true');
+        }
+        
+        // Event listeners
+        document.getElementById('btn-show-tutorial').addEventListener('click', () => this.show());
+        
+        this.prevBtn.addEventListener('click', () => this.prevStep());
+        this.nextBtn.addEventListener('click', () => this.nextStep());
+        
+        this.dots.forEach(dot => {
+            dot.addEventListener('click', (e) => {
+                const step = parseInt(e.target.dataset.step);
+                this.goToStep(step);
+            });
+        });
+        
+        // Close on overlay click? Better not, use button only
+    },
+    
+    show() {
+        this.overlay.classList.add('active');
+        this.goToStep(1);
+    },
+    
+    hide() {
+        this.overlay.classList.remove('active');
+    },
+    
+    goToStep(step) {
+        this.currentStep = step;
+        
+        // Update steps visibility
+        this.steps.forEach(s => s.classList.remove('active'));
+        document.getElementById(`step-${step}`).classList.add('active');
+        
+        // Update dots
+        this.dots.forEach((dot, i) => {
+            if (i + 1 === step) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+        
+        // Update buttons
+        this.prevBtn.disabled = step === 1;
+        
+        if (step === this.totalSteps) {
+            this.nextBtn.style.display = 'none';
+            this.startBtn.style.display = 'flex';
+        } else {
+            this.nextBtn.style.display = 'flex';
+            this.startBtn.style.display = 'none';
+            this.nextBtn.innerHTML = `Selanjutnya <i class="fa-solid fa-arrow-right"></i>`;
+        }
+    },
+    
+    prevStep() {
+        if (this.currentStep > 1) {
+            this.goToStep(this.currentStep - 1);
+        }
+    },
+    
+    nextStep() {
+        if (this.currentStep < this.totalSteps) {
+            this.goToStep(this.currentStep + 1);
+        }
+    }
+};
+
 // === MAP INIT ===
 const map = L.map('map').setView([-7.1155, 110.432], 15);
 
@@ -782,11 +1417,7 @@ const blockColors = {
     'Blok Konservasi Khusus': { color: '#2ecc71', fill: '#2ecc71', icon: 'fa-shield' },
     'Blok Rehabilitasi - Agroforesti': { color: '#f39c12', fill: '#f39c12', icon: 'fa-seedling' },
     'Blok Riset - Kemitraan': { color: '#9b59b6', fill: '#9b59b6', icon: 'fa-handshake' },
-    'Blok Pemanfaatan dan Eco-eduwisata': { color: '#e67e22', fill: '#e67e22', icon: 'fa-umbrella-beach' },
-    'Blok Pemanfaatan dan Eco-eduwisata': { color: '#e67e22', fill: '#e67e22', icon: 'fa-umbrella-beach' },
-    'Blok Rehabilitasi - Agroforesti': { color: '#f39c12', fill: '#f39c12', icon: 'fa-seedling' },
-    'Blok Konservasi Khusus': { color: '#2ecc71', fill: '#2ecc71', icon: 'fa-shield' },
-    'Blok Riset - Kemitraan': { color: '#9b59b6', fill: '#9b59b6', icon: 'fa-handshake' }
+    'Blok Pemanfaatan dan Eco-eduwisata': { color: '#e67e22', fill: '#e67e22', icon: 'fa-umbrella-beach' }
 };
 
 // === ICON FUNCTION ===
@@ -811,7 +1442,7 @@ function getIcon(category) {
     });
 }
 
-// === DATA BLOK KHDTK ===
+// === DATA BLOK KHDTK (DISINGKAT UNTUK TUTORIAL - GUNAKAN DATA LENGKAP SEPERTI SEBELUMNYA) ===
 const boundaryData = {
 "type": "FeatureCollection",
 "name": "blok_khdtk",
@@ -836,7 +1467,7 @@ const boundaryData = {
 ]
 };
 
-// === DATA FASILITAS ===
+// === DATA FASILITAS (SINGKAT) ===
 const facilitiesData = {
     "type": "FeatureCollection",
     "name": "point_Fasil",
@@ -1099,22 +1730,18 @@ const facilitiesData = {
 
 // === LOAD BOUNDARY (BATAS AREA PER BLOK) ===
 function loadBoundary() {
-    // Hapus boundary layer yang sudah ada
     boundaryLayer.clearLayers();
     boundaryLabels.forEach(label => {
         if (map.hasLayer(label)) map.removeLayer(label);
     });
     boundaryLabels = [];
     
-    // Unique blocks untuk legend
     const uniqueBlocks = new Set();
     
-    // Load GeoJSON per feature
     L.geoJSON(boundaryData, {
         style: function(feature) {
             const blockName = feature.properties.Name;
             const colors = blockColors[blockName] || { color: '#95a5a6', fill: '#95a5a6' };
-            
             return {
                 color: colors.color,
                 weight: 2.5,
@@ -1131,17 +1758,14 @@ function loadBoundary() {
             const blockName = props.Name;
             const colors = blockColors[blockName] || { color: '#95a5a6', fill: '#95a5a6', icon: 'fa-tree' };
             
-            // Add to unique blocks for legend
             uniqueBlocks.add(blockName);
             
-            // POPUP INFORMASI DETAIL BLOK
             const popupContent = `
                 <div class="popup-content">
                     <h3><i class="fa-solid ${colors.icon || 'fa-tree'}" style="color: ${colors.color};"></i> ${blockName}</h3>
                     <div class="badge" style="background: ${colors.color};">
                         <i class="fa-regular fa-clock"></i> Ditetapkan ${props.tahun || '2020'}
                     </div>
-                    
                     <div class="popup-details">
                         <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
@@ -1152,37 +1776,19 @@ function loadBoundary() {
                                 <span><i class="fa-solid fa-road"></i> <strong>Aksesibilitas:</strong> ${props.akses || 'Sedang'}</span>
                             </div>
                         </div>
-                        
                         <div style="margin-bottom: 10px;">
                             <i class="fa-solid fa-info-circle" style="color: ${colors.color};"></i> 
                             <strong>Deskripsi:</strong>
                             <p style="margin-top: 5px; text-align: justify;">${props.descriptio || 'Belum ada deskripsi'}</p>
                         </div>
-                        
-                        <div style="display: flex; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ddd;">
-                            <span style="font-size: 0.8rem; color: #7f8c8d;">
-                                <i class="fa-solid fa-flask"></i> Zona Penelitian
-                            </span>
-                            <span style="font-size: 0.8rem; color: #7f8c8d;">
-                                <i class="fa-solid fa-shield"></i> Kawasan Lindung
-                            </span>
-                        </div>
                     </div>
                 </div>
             `;
             
-            layer.bindPopup(popupContent, {
-                maxWidth: 350,
-                className: 'custom-popup'
-            });
+            layer.bindPopup(popupContent);
             
-            // Hover effects
             layer.on('mouseover', function() {
-                this.setStyle({
-                    weight: 4,
-                    opacity: 1,
-                    fillOpacity: 0.35
-                });
+                this.setStyle({ weight: 4, opacity: 1, fillOpacity: 0.35 });
                 this.bringToFront();
             });
             
@@ -1190,20 +1796,14 @@ function loadBoundary() {
                 boundaryLayer.resetStyle(this);
             });
             
-            // Click event - zoom to block
             layer.on('click', function() {
-                map.fitBounds(this.getBounds(), {
-                    padding: [50, 50],
-                    maxZoom: 17
-                });
+                map.fitBounds(this.getBounds(), { padding: [50, 50], maxZoom: 17 });
             });
             
-            // Add to boundary layer
             boundaryLayer.addLayer(layer);
         }
     });
     
-    // Generate legend setelah semua blok diproses
     generateBlockLegend(Array.from(uniqueBlocks));
 }
 
@@ -1214,7 +1814,6 @@ function generateBlockLegend(blocks) {
     
     legendContainer.innerHTML = '';
     
-    // Urutan blok yang diinginkan
     const blockOrder = [
         'Blok Riset - Edukasi',
         'Blok Konservasi Khusus',
@@ -1223,7 +1822,6 @@ function generateBlockLegend(blocks) {
         'Blok Pemanfaatan dan Eco-eduwisata'
     ];
     
-    // Sort blocks berdasarkan urutan
     const sortedBlocks = blocks.sort((a, b) => {
         const indexA = blockOrder.indexOf(a);
         const indexB = blockOrder.indexOf(b);
@@ -1235,7 +1833,6 @@ function generateBlockLegend(blocks) {
     sortedBlocks.forEach(blockName => {
         const colors = blockColors[blockName] || { color: '#95a5a6', fill: '#95a5a6', icon: 'fa-tree' };
         
-        // Get description from data
         let description = '';
         const feature = boundaryData.features.find(f => f.properties.Name === blockName);
         if (feature) {
@@ -1246,13 +1843,9 @@ function generateBlockLegend(blocks) {
         const legendItem = document.createElement('div');
         legendItem.className = 'legend-item';
         legendItem.onclick = function() {
-            // Zoom to block saat legend diklik
             boundaryLayer.eachLayer(layer => {
                 if (layer.feature && layer.feature.properties.Name === blockName) {
-                    map.fitBounds(layer.getBounds(), {
-                        padding: [50, 50],
-                        maxZoom: 17
-                    });
+                    map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 17 });
                     layer.openPopup();
                 }
             });
@@ -1272,41 +1865,32 @@ function generateBlockLegend(blocks) {
         legendContainer.appendChild(legendItem);
     });
     
-    // Update total blocks di stats
     const totalBlocksEl = document.getElementById('total-blocks');
-    if (totalBlocksEl) {
-        totalBlocksEl.textContent = blocks.length;
-    }
+    if (totalBlocksEl) totalBlocksEl.textContent = blocks.length;
 }
 
 // === LOAD FACILITIES ===
 function loadFacilities() {
-    // Show loading
     document.getElementById('loading').style.display = 'block';
     
-    // Clear existing markers and list
     markersLayer.clearLayers();
     const facilityList = document.getElementById('facility-list');
     facilityList.innerHTML = '';
     
-    // Get filter values
     const filterType = document.getElementById('filter-type').value;
     const searchText = document.getElementById('search-facility').value.toLowerCase();
     
-    // Filter facilities
     const filteredFeatures = facilitiesData.features.filter(feature => {
         const matchesCategory = filterType === 'all' || feature.properties.category === filterType;
         const matchesSearch = searchText === '' || 
             feature.properties.Nama.toLowerCase().includes(searchText) ||
             (feature.properties.description && feature.properties.description.toLowerCase().includes(searchText));
-        
         return matchesCategory && matchesSearch;
     });
     
-    // Update visible facilities count
     document.getElementById('visible-facilities').textContent = filteredFeatures.length;
+    document.getElementById('total-facilities').textContent = facilitiesData.features.length;
     
-    // Add markers to map
     filteredFeatures.forEach(feature => {
         const props = feature.properties;
         const coords = feature.geometry.coordinates;
@@ -1315,7 +1899,6 @@ function loadFacilities() {
             icon: getIcon(props.category)
         }).addTo(markersLayer);
         
-        // Create popup content
         const popupContent = `
             <div class="popup-content">
                 <h3>${props.Nama}</h3>
@@ -1331,18 +1914,15 @@ function loadFacilities() {
         
         marker.bindPopup(popupContent);
         
-        // Add click event
         marker.on('click', function() {
             highlightFacilityInList(props.id);
             map.setView([coords[1], coords[0]], 18);
             this.openPopup();
         });
         
-        // Add to sidebar list
         addFacilityToList(props);
     });
     
-    // Hide loading
     setTimeout(() => {
         document.getElementById('loading').style.display = 'none';
     }, 500);
@@ -1434,28 +2014,19 @@ function toggleBoundary(visible = true) {
 
 // === INITIALIZE ===
 function init() {
-    // Load facilities
+    // Load data
     loadFacilities();
-    
-    // Load boundary
     loadBoundary();
-    
-    // Add boundary layer to map
     map.addLayer(boundaryLayer);
     
     // Event listeners
     document.getElementById('filter-type').addEventListener('change', loadFacilities);
     document.getElementById('search-facility').addEventListener('input', loadFacilities);
     
-    // Toggle boundary
-    const toggleBoundaryCheckbox = document.getElementById('toggle-boundary');
-    if (toggleBoundaryCheckbox) {
-        toggleBoundaryCheckbox.addEventListener('change', function() {
-            toggleBoundary(this.checked);
-        });
-    }
+    document.getElementById('toggle-boundary').addEventListener('change', function() {
+        toggleBoundary(this.checked);
+    });
     
-    // Location button
     document.getElementById('btn-locate').addEventListener('click', function() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
@@ -1480,7 +2051,6 @@ function init() {
         }
     });
     
-    // Route to main gate
     document.getElementById('btn-route').addEventListener('click', function() {
         const mainGate = facilitiesData.features.find(f => f.properties.category === 'akses');
         
@@ -1500,9 +2070,7 @@ function init() {
                         L.latLng(gateCoords[1], gateCoords[0])
                     ],
                     routeWhileDragging: false,
-                    lineOptions: {
-                        styles: [{ color: '#27ae60', weight: 5, opacity: 0.7 }]
-                    },
+                    lineOptions: { styles: [{ color: '#27ae60', weight: 5, opacity: 0.7 }] },
                     createMarker: function() { return null; },
                     showAlternatives: false
                 }).addTo(map);
@@ -1517,7 +2085,6 @@ function init() {
         }
     });
     
-    // Clear route
     document.getElementById('btn-clear-route').addEventListener('click', function() {
         if (routingControl) {
             map.removeControl(routingControl);
@@ -1525,31 +2092,20 @@ function init() {
         }
     });
     
-    // Map controls
     document.getElementById('btn-zoom-in').addEventListener('click', () => map.zoomIn());
     document.getElementById('btn-zoom-out').addEventListener('click', () => map.zoomOut());
     
-    // Fullscreen
     document.getElementById('btn-fullscreen').addEventListener('click', function() {
         const elem = document.getElementById('map-container');
-        
         if (!document.fullscreenElement) {
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            }
+            elem.requestFullscreen ? elem.requestFullscreen() : 
+            elem.webkitRequestFullscreen ? elem.webkitRequestFullscreen() : 
+            elem.msRequestFullscreen ? elem.msRequestFullscreen() : null;
             this.innerHTML = '<i class="fa-solid fa-compress"></i>';
         } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
+            document.exitFullscreen ? document.exitFullscreen() : 
+            document.webkitExitFullscreen ? document.webkitExitFullscreen() : 
+            document.msExitFullscreen ? document.msExitFullscreen() : null;
             this.innerHTML = '<i class="fa-solid fa-expand"></i>';
         }
     });
@@ -1561,7 +2117,6 @@ function init() {
         }
     });
     
-    // Basemap change handler
     document.querySelectorAll('input[name="basemap"]').forEach(radio => {
         radio.onchange = () => {
             map.eachLayer(layer => {
@@ -1570,27 +2125,21 @@ function init() {
                 }
             });
             
-            if (radio.value === 'osm') {
-                osm.addTo(map);
-            } else if (radio.value === 'imagery') {
-                sat.addTo(map);
-            } else if (radio.value === 'topo') {
-                topo.addTo(map);
-            }
+            if (radio.value === 'osm') osm.addTo(map);
+            else if (radio.value === 'imagery') sat.addTo(map);
+            else if (radio.value === 'topo') topo.addTo(map);
             
-            // Re-add layers
             if (markersLayer) map.addLayer(markersLayer);
             if (boundaryLayer && document.getElementById('toggle-boundary')?.checked) {
                 map.addLayer(boundaryLayer);
-                boundaryLabels.forEach(label => {
-                    if (!map.hasLayer(label)) map.addLayer(label);
-                });
             }
         };
     });
+    
+    // Initialize tutorial
+    Tutorial.init();
 }
 
-// Start application
 document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
