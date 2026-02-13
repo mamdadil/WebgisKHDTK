@@ -1302,7 +1302,7 @@ input:checked + .slider:before {
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
 <script>
-    
+
 // === TUTORIAL SYSTEM ===
 const Tutorial = {
     overlay: document.getElementById('tutorial-overlay'),
@@ -1315,18 +1315,26 @@ const Tutorial = {
     totalSteps: 4,
     
     init() {
-        const hasSeenTutorial = localStorage.getItem('khdtk-tutorial-seen');
-        if (!hasSeenTutorial) {
-            setTimeout(() => this.show(), 500);
-            localStorage.setItem('khdtk-tutorial-seen', 'true');
+        // Tampilkan tutorial setelah halaman selesai loading
+        setTimeout(() => this.show(), 500);
+        
+        // Tetap simpan status sudah pernah lihat untuk tombol "?"
+        localStorage.setItem('khdtk-tutorial-seen', 'true');
+        
+        // Event listeners
+        const showBtn = document.getElementById('btn-show-tutorial');
+        if (showBtn) {
+            showBtn.addEventListener('click', () => this.show());
         }
         
-        document.getElementById('btn-show-tutorial').addEventListener('click', () => this.show());
+        if (this.prevBtn) {
+            this.prevBtn.addEventListener('click', () => this.prevStep());
+        }
         
-        this.prevBtn.addEventListener('click', () => this.prevStep());
-        this.nextBtn.addEventListener('click', () => this.nextStep());
+        if (this.nextBtn) {
+            this.nextBtn.addEventListener('click', () => this.nextStep());
+        }
         
-        // 🟢 FIX: Tombol Mulai Jelajah sekarang bisa diklik dan menutup tutorial
         if (this.startBtn) {
             this.startBtn.addEventListener('click', () => this.hide());
         }
@@ -1352,7 +1360,8 @@ const Tutorial = {
         this.currentStep = step;
         
         this.steps.forEach(s => s.classList.remove('active'));
-        document.getElementById(`step-${step}`).classList.add('active');
+        const currentStepEl = document.getElementById(`step-${step}`);
+        if (currentStepEl) currentStepEl.classList.add('active');
         
         this.dots.forEach((dot, i) => {
             if (i + 1 === step) {
@@ -1362,15 +1371,20 @@ const Tutorial = {
             }
         });
         
-        this.prevBtn.disabled = step === 1;
+        if (this.prevBtn) this.prevBtn.disabled = step === 1;
         
         if (step === this.totalSteps) {
-            this.nextBtn.style.display = 'none';
-            this.startBtn.style.display = 'flex';
+            if (this.nextBtn) this.nextBtn.style.display = 'none';
+            if (this.startBtn) {
+                this.startBtn.style.display = 'flex';
+                this.startBtn.style.background = 'var(--primary)';
+            }
         } else {
-            this.nextBtn.style.display = 'flex';
-            this.startBtn.style.display = 'none';
-            this.nextBtn.innerHTML = `Selanjutnya <i class="fa-solid fa-arrow-right"></i>`;
+            if (this.nextBtn) {
+                this.nextBtn.style.display = 'flex';
+                this.nextBtn.innerHTML = `Selanjutnya <i class="fa-solid fa-arrow-right"></i>`;
+            }
+            if (this.startBtn) this.startBtn.style.display = 'none';
         }
     },
     
